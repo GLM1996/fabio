@@ -304,7 +304,7 @@ function renderizarDatos(data) {
         <td>${item.calls.length}</td>
         <td>${item.clientIntent}</td>
         <td>${item.clientTarget}</td> 
-        <td>${item.clientTarget}</td> 
+        <td>Not Yet</td> 
         <td>${ item.clientIntent > 0 ? (item.calls.length / item.clientIntent).toFixed(2) : 0}</td>
         <td>${ item.clientIntent > 0 && item.clientTarget > 0 ? (item.clientTarget / item.clientIntent).toFixed(2) : 0}</td>       
     `;
