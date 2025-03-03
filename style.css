@@ -1,0 +1,47 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+table tbody tr td{
+    text-align: center;
+}
+.table_modal {
+    max-height: 400px; /* Altura máxima para que el scroll funcione */
+    overflow-y: auto; /* Habilita el scroll vertical */
+}
+
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+    position: relative; /* Necesario para que sticky funcione */
+}
+
+table thead {
+    position: sticky;
+    top: 0;
+    background-color: white; /* Asegura que el encabezado no sea transparente */
+    z-index: 10; /* Hace que el encabezado esté sobre las filas */
+}
+.fila_resumen{
+    background-color: black;
+    color: white;
+    font-weight: bold;
+}
+ .fila_resumen td{
+    color: inherit; /* Hereda el color del tr o el global */
+    font-weight: inherit;
+    background-color: inherit;
+ }
+ ul li a{
+    color: white!important;
+ }
+ ul li a:hover{
+    background-color: gray;
+    border-radius: 5px;
+    color: gainsboro!important;
+ }
+ .active{
+    background-color: gray;
+    border-radius: 5px;
+ }
