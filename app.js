@@ -28,12 +28,13 @@ enlaces.forEach(enlace => {
   });
 });
 
-
-
 document.addEventListener("DOMContentLoaded", async () => {
   let fecha = new Date();
-  let mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Sumar 1 y asegurar dos dígitos
-  let dia = String(fecha.getDate()).padStart(2, '0'); // Asegurar dos dígitos
+  //fecha.setDate(fecha.getDate() - 1); // Restar un día
+
+  let mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Asegurar dos dígitos en el mes
+  let dia = String(fecha.getDate()).padStart(2, '0'); // Asegurar dos dígitos en el día
+
   document.getElementById('start_date').value = `${fecha.getFullYear()}-${mes}-${dia}`;
 
   agents = await getAgent();
@@ -148,9 +149,8 @@ async function buscar() {
       const data = result.calls;
 
       // Agregar los datos al array de llamadas
-      calls.push(...data.filter(call => call.isIncoming === false && call.userId === Number(optionSelected.id)
+      calls.push(...data.filter(call => call.userId === Number(optionSelected.id)
       ));
-
 
       // Obtener la URL de la próxima página
       url = result._metadata.nextLink;
@@ -159,6 +159,7 @@ async function buscar() {
     console.error("Error:", error);
     throw new Error("Error al obtener las llamadas: " + error.message);
   }
+
   return calls; // Retornar las llamadas para su uso posterior
 }
 
@@ -192,11 +193,13 @@ let hoursArray = (hourStart, hourEnd) => {
 
   return result;
 };
+function formatTime(seconds) {
+  let minutes = Math.floor(seconds / 60);
+  let secs = seconds % 60;
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
 
-async function cargarText(personId, start_date, end_date) {
-
-  let calls = [];
-  let cantidad = 0
+async function cargarTextPerson(personId, start_date, end_date) {
 
   const options = {
     method: "GET",
@@ -209,32 +212,75 @@ async function cargarText(personId, start_date, end_date) {
   try {
     let url = `https://api.followupboss.com/v1/textMessages?personId=${personId}?sort=-created&createdAfter=${start_date}&createdBefore=${end_date}`;
 
-
     const response = await fetch(url, options);
 
     if (!response.ok) {
       throw new Error("Error al obtener los texts");
     }
     const result = await response.json();
-    console.log(result)
-    cantidad = result._metadata.total
-    // console.log(cantidad)
-    return cantidad
+
+    return result
+
   } catch (error) {
     console.error("Error:", error);
     throw new Error("Error al obtener las llamadas: " + error.message);
+  }
+
+
+}
+async function cargarText(listPeerson, start_date, end_date) {
+
+
+  let listId = [...listPeerson]
+
+  if (listId.length !== 0) {
+    // Usar Promise.all() para hacer las solicitudes en paralelo
+    const textMessages = await Promise.all(listId.map(async (personId) => {
+      let cantidad = 0; // Definir cantidad antes de usarla
+
+      if (personId) {
+        // Esperar a que la función cargarTextPerson se resuelva
+        const textmessages = await cargarTextPerson(personId, start_date, end_date);
+
+        // Asegurarse de que textmessages tiene la propiedad _metadata y verificar el total
+        if (textmessages._metadata && textmessages._metadata.total !== 0) {
+          // Filtrar los mensajes donde el userId sea igual al selectAgent.id
+          const filteredMessages = textmessages.filter(message => message.userId === selectAgent.id);
+
+          // Asignar la cantidad de mensajes filtrados
+          cantidad = filteredMessages.length;
+        }
+      }
+      // Retornar la cantidad de mensajes filtrados
+      return cantidad;
+    }));
+     // Mostar el resultado final
+     return textMessages
+  } else {
+    return [0]
   }
 }
 
 document.getElementById("search").addEventListener("click", async () => {
 
   tbody.innerHTML = ''
+  document.getElementById('summary').hidden = false
 
   spinner.hidden = false
 
   let timeZone = '-06:00'
   let callFilters = []
-  calls = await buscar();
+  let calls = await buscar();
+
+  //Llenando datos summary
+  let callMade = 0
+  let callReceived = 0
+  let callConnected = 0
+  let callConversation = 0
+  let callMissed = 0
+  let talkTime = 0
+
+  let banderaCall = true
 
   let timeFrame = hoursArray(Number(document.getElementById('start_hours').value), Number(document.getElementById('end_hours').value))
 
@@ -244,38 +290,60 @@ document.getElementById("search").addEventListener("click", async () => {
     const uniquePersons = new Set();
     let clientTarget = 0
     let callFind = []
-    let textMessages
+    let textMessages = []
 
     let start_date = new Date(convertirDateUTC(document.getElementById('start_date').value, timeFrame[i].start_date, timeZone))
     let end_date = new Date(convertirDateUTC(document.getElementById('start_date').value, timeFrame[i].end_date, timeZone))
 
-    /*calls.forEach(call => {
-      const callDate = new Date(call.created);
+    let remainingCall = []
 
-      if (callDate >= start_date && callDate < end_date) {
-        callFind.push(call)
-        countTimeCall += call.duration
-        uniquePersons.add(call.personId)
-       const  text = await cargarText(call.personId, start_date, end_date)
-        if (call.duration >= 90) {
-          clientTarget++
-        }
-      }
-    })*/
     for (const call of calls) {
-      const callDate = new Date(call.created);
+      if (call.isIncoming === false) {
+        const callDate = new Date(call.created);
 
-      if (callDate >= start_date && callDate < end_date) {
-        callFind.push(call);
-        countTimeCall += call.duration;
-        uniquePersons.add(call.personId);
-        //textMessages = await cargarText(call.personId, start_date, end_date); // Esperar el resultado
-        if (call.duration >= 90) {
-          clientTarget++;
+        if (callDate >= start_date && callDate < end_date) {
+          callFind.push(call);
+          countTimeCall += call.duration;
+          uniquePersons.add(call.personId);
+          //textMessages = await cargarText(call.personId, start_date, end_date); // Esperar el resultado
+
+          if (call.duration >= 90) {
+            clientTarget++;
+          }
+        } else {
+          remainingCall.push(call)
+        }
+        if (banderaCall) {
+          callMade++
+          if (call.duration >= 60) {
+            callConnected++
+          }
+          if (call.duration >= 120) {
+            callConversation++
+          }
+          talkTime += call.duration
+
+
+        }
+      } else {
+        if (banderaCall) {
+          callReceived++
+          if (call.duration >= 60) {
+            callConnected++
+          }
+          if (call.duration >= 120) {
+            callConversation++
+          }
+          talkTime += call.duration
+
+          if (call.duration === 0) {
+            callMissed++
+          }
         }
       }
     }
-
+    //textMessages = await cargarText(uniquePersons, start_date, end_date); // Esperar el resultado
+    //let cantTextMessages = textMessages.reduce((acc, currentValue) => acc + currentValue, 0);
     const clientIntent = uniquePersons.size;
 
     callFilters.push({
@@ -284,14 +352,26 @@ document.getElementById("search").addEventListener("click", async () => {
       'timeCall': countTimeCall,
       'calls': callFind,
       'clientIntent': clientIntent,
-      'clientTarget': clientTarget
-      //'textMessages': textMessages
+      'clientTarget': clientTarget,
+      'textMessages': 0
     })
+
+    calls = remainingCall
+
+    banderaCall = false
   }
+  document.getElementById('call_made').textContent = callMade
+  document.getElementById('call_received').textContent = callReceived
+  document.getElementById('call_connected').textContent = callConnected
+  document.getElementById('call_conversations').textContent = callConversation
+  document.getElementById('call_talk_time').textContent = formatTime(talkTime)
+  document.getElementById('call_missed').textContent = callMissed
+
   renderizarDatos(callFilters)
 
   spinner.hidden = true
 });
+
 
 function renderizarDatos(data) {
 
@@ -300,17 +380,17 @@ function renderizarDatos(data) {
     row.innerHTML = `
         <td>${item.agent /*Name Agente*/}</td>
         <td>${item.timeFrame /*Horario del Dia*/}</td>
-        <td>${(item.timeCall / 60).toFixed(2) /*Tiempo de Llamada*/}</td>
+        <td>${formatTime(item.timeCall) /*Tiempo de Llamada*/}</td>
         <td>${item.calls.length /*Intentos*/}</td>
         <td>${item.clientIntent /*Clientes Intentados*/}</td>
         <td>${item.clientTarget /*Clientes Alcanzados*/}</td> 
-        <td>Not Yet</td> 
+        <td>${item.textMessages /*Contador de mensajes*/}</td> 
         <td>${item.clientIntent > 0 ? (item.calls.length / item.clientIntent).toFixed(2) : 0 /*Intentos x clientes*/}</td>
         <td>${item.clientIntent > 0 && item.clientTarget > 0 ? (item.clientTarget / item.clientIntent).toFixed(2) : 0 /*Contactabilidad */}</td> 
         <td>${((item.calls.length * ringTime) + (item.clientIntent * wrapUp) + (0 * textTime) + (item.timeCall / 60)).toFixed(2)/*Tiempo de gestion */}</td>
         <td>Not Yet</td>
     `;
-    
+
     row.addEventListener('click', () => {
       renderizarDatosModal(item.timeFrame, item.calls)
       const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
