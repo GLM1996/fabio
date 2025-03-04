@@ -10,9 +10,9 @@ const tbody = document.getElementById('tablaDatos')
 const tbodyModal = document.getElementById('tablaDatosModal')
 const spinner = document.getElementById('spinner')
 
-const textTime = document.getElementById('text_time').value
-const wrapUp = document.getElementById('wrap_up').value
-const ringTime = document.getElementById('ring_time').value
+const textTime = Number(document.getElementById('text_time').value)
+const wrapUp = Number(document.getElementById('wrap_up').value)
+const ringTime = Number(document.getElementById('ring_time').value)
 
 let enlaces = document.querySelectorAll('.nav-link');
 
@@ -298,16 +298,19 @@ function renderizarDatos(data) {
   data.forEach(item => {
     const row = document.createElement("tr");
     row.innerHTML = `
-        <td>${item.agent}</td>
-        <td>${item.timeFrame}</td>
-        <td>${(item.timeCall / 60).toFixed(2)}</td>
-        <td>${item.calls.length}</td>
-        <td>${item.clientIntent}</td>
-        <td>${item.clientTarget}</td> 
+        <td>${item.agent /*Name Agente*/}</td>
+        <td>${item.timeFrame /*Horario del Dia*/}</td>
+        <td>${(item.timeCall / 60).toFixed(2) /*Tiempo de Llamada*/}</td>
+        <td>${item.calls.length /*Intentos*/}</td>
+        <td>${item.clientIntent /*Clientes Intentados*/}</td>
+        <td>${item.clientTarget /*Clientes Alcanzados*/}</td> 
         <td>Not Yet</td> 
-        <td>${ item.clientIntent > 0 ? (item.calls.length / item.clientIntent).toFixed(2) : 0}</td>
-        <td>${ item.clientIntent > 0 && item.clientTarget > 0 ? (item.clientTarget / item.clientIntent).toFixed(2) : 0}</td>       
+        <td>${item.clientIntent > 0 ? (item.calls.length / item.clientIntent).toFixed(2) : 0 /*Intentos x clientes*/}</td>
+        <td>${item.clientIntent > 0 && item.clientTarget > 0 ? (item.clientTarget / item.clientIntent).toFixed(2) : 0 /*Contactabilidad */}</td> 
+        <td>${((item.calls.length * ringTime) + (item.clientIntent * wrapUp) + (0 * textTime) + (item.timeCall / 60)).toFixed(2)/*Tiempo de gestion */}</td>
+        <td>Not Yet</td>
     `;
+    
     row.addEventListener('click', () => {
       renderizarDatosModal(item.timeFrame, item.calls)
       const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
@@ -317,15 +320,15 @@ function renderizarDatos(data) {
     tbody.appendChild(row);
   });
   //resumen
- /* const row = document.createElement("tr");
-  row.innerHTML = `
-        <td>Resumen</td>
-        <td>${calls.length}</td>
-        <td>${calls.length}</td>
-        <td>${calls.length}</td>
-    `;
-  row.className = 'fila_resumen'
-  tbody.appendChild(row);*/
+  /* const row = document.createElement("tr");
+   row.innerHTML = `
+         <td>Resumen</td>
+         <td>${calls.length}</td>
+         <td>${calls.length}</td>
+         <td>${calls.length}</td>
+     `;
+   row.className = 'fila_resumen'
+   tbody.appendChild(row);*/
 
 }
 
