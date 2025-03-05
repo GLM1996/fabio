@@ -5,6 +5,8 @@ let agents = [];
 let agentSelected = [];
 let calls
 
+
+
 const selectAgent = document.getElementById("select_agent");
 const tbody = document.getElementById('tablaDatos')
 const tbodyModal = document.getElementById('tablaDatosModal')
@@ -174,13 +176,17 @@ function convertirDateUTC(fecha, hours, timeZone) {
   return utcDate
 }
 function convertUTCToLocal(dateUTC) {
-  const date = new Date(dateUTC); // Convierte la fecha UTC en un objeto Date 
+  const date = new Date(dateUTC); // Interpretar la fecha como UTC
+  
+  const hours = date.getUTCHours().toString().padStart(2, '0'); // Asegurar dos dígitos
+  const mins = date.getUTCMinutes().toString().padStart(2, '0'); // Asegurar dos dígitos
+  const seconds = date.getUTCSeconds().toString().padStart(2, '0');
 
-  // Ajusta la fecha para la zona horaria
-  date.setHours(date.getHours());
-
-  return date;
+  return `${hours - 8}:${mins}:${seconds}`;
 }
+
+
+
 let hoursArray = (hourStart, hourEnd) => {
   let result = [];
 
@@ -254,8 +260,8 @@ async function cargarText(listPeerson, start_date, end_date) {
       // Retornar la cantidad de mensajes filtrados
       return cantidad;
     }));
-     // Mostar el resultado final
-     return textMessages
+    // Mostar el resultado final
+    return textMessages
   } else {
     return [0]
   }
@@ -268,7 +274,7 @@ document.getElementById("search").addEventListener("click", async () => {
 
   spinner.hidden = false
 
-  let timeZone = '-06:00'
+  let timeZone = '-08:00'
   let callFilters = []
   let calls = await buscar();
 
