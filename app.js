@@ -1,10 +1,12 @@
 //import { timeFrame } from "./util.js";
 
-const API_KEY = "fka_0fIGCHDzG4WXvR0orU2B6eal6VhS8Sx29N";
+const servidor = 'https://backendembededapp.onrender.com'
+//const servidor = 'http://localhost:5500'
+
+
 let agents = [];
 let agentSelected = [];
 let calls
-
 
 
 const selectAgent = document.getElementById("select_agent");
@@ -16,19 +18,8 @@ const textTime = Number(document.getElementById('text_time').value)
 const wrapUp = Number(document.getElementById('wrap_up').value)
 const ringTime = Number(document.getElementById('ring_time').value)
 
-let enlaces = document.querySelectorAll('.nav-link');
 
-enlaces.forEach(enlace => {
-  enlace.addEventListener('click', () => {
-    let enlaceActivo = document.querySelector('.nav-link.active'); // Aseguramos que sea un .nav-link
-
-    if (enlaceActivo) {
-      enlaceActivo.classList.remove('active'); // Solo si existe
-    }
-
-    enlace.classList.add('active');
-  });
-});
+//TODO-----------------------------------------------------Funciones al cargar la pagina-------------------------------
 
 document.addEventListener("DOMContentLoaded", async () => {
   let fecha = new Date();
@@ -39,55 +30,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById('start_date').value = `${fecha.getFullYear()}-${mes}-${dia}`;
 
-  agents = await getAgent();
+  agents = await getAgents();
   cargarSelectAgent();
 });
 
-async function getTeam() {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization: "Basic " + btoa(API_KEY + ":"),
-    },
-  };
-  const url =
-    "https://api.followupboss.com/v1/teams/2";
+async function getAgents() {
+  const url = `${servidor}/api/reportingFabio/searchAgents`
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      console.log('Error')
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
 
-  const response = await fetch(url, options);
-
-  if (!response.ok) {
-    throw new Error("Consulta incorrecta");
   }
-  const data = await response.json();
-  return data;
-}
-
-async function getAgent() {
-
-  let listUsersId = await getTeam()
-  console.log(listUsersId.userIds)
-
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization: "Basic " + btoa(API_KEY + ":"),
-    },
-  };
-  const url =
-    "https://api.followupboss.com/v1/users?limit=100&offset=0&role=Agent&includeDeleted=false";
-
-  const response = await fetch(url, options);
-
-  if (!response.ok) {
-    throw new Error("Consulta incorrecta");
-  }
-  const data = await response.json();
-
-  const filteredData = data.users.filter(item => listUsersId.userIds.includes(item.id));
-
-  return filteredData;
 }
 
 function cargarSelectAgent() {
@@ -101,171 +59,30 @@ function cargarSelectAgent() {
   }
 }
 
-async function buscar() {
-  // Obtener la opción seleccionada y la fecha
-  const optionSelected = selectAgent.options[selectAgent.selectedIndex];
-  let selectedDate = document.getElementById("start_date").value;
+//TODO-----------------------------------------------------Funciones al cargar la pagina-------------------------------
 
-  let calls = [];
+//!--------------------------------------------------------Funciones de los addEventlistener---------------------------
 
-  // Definir el día específico y la zona horaria
-  const diaEspecifico = selectedDate;
-  const zonaHoraria = 6; // Ajuste de zona horaria  
+let enlaces = document.querySelectorAll('.nav-link');
 
-  // Crear fechas de inicio y fin del día en UTC
-  const inicioDia = new Date(`${diaEspecifico}T00:00:00Z`);
-  const finDia = new Date(`${diaEspecifico}T23:59:59Z`);
+enlaces.forEach(enlace => {
+  enlace.addEventListener('click', () => {
 
-  // Ajustar las fechas según la zona horaria
-  const inicioAjustado = new Date(
-    inicioDia.getTime() + (zonaHoraria * 60 * 60 * 1000)
-  );
-  const finAjustado = new Date(
-    finDia.getTime() + (zonaHoraria * 60 * 60 * 1000)
-  );
+    let enlaceActivo = document.querySelector('.nav-link.active'); // Aseguramos que sea un .nav-link
 
-  // Convertir a formato ISO (UTC)
-  const inicioUTC = inicioAjustado.toISOString();
-  const finUTC = finAjustado.toISOString();
-
-
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization: "Basic " + btoa(API_KEY + ":"),
-    },
-  };
-
-  try {
-    let url = `https://api.followupboss.com/v1/calls?sort=-created&createdAfter=${inicioUTC}&createdBefore=${finUTC}&limit=100`;
-
-    while (url) {
-      const response = await fetch(url, options);
-
-      if (!response.ok) {
-        throw new Error("Error al obtener las llamadas");
-      }
-
-      const result = await response.json();
-      const data = result.calls;
-
-      // Agregar los datos al array de llamadas
-      calls.push(...data.filter(call => call.userId === Number(optionSelected.id)
-      ));
-
-      // Obtener la URL de la próxima página
-      url = result._metadata.nextLink;
+    if (enlaceActivo) {
+      enlaceActivo.classList.remove('active'); // Solo si existe
     }
-  } catch (error) {
-    console.error("Error:", error);
-    throw new Error("Error al obtener las llamadas: " + error.message);
-  }
-
-  return calls; // Retornar las llamadas para su uso posterior
-}
-
-function convertirDateUTC(fecha, hours, timeZone) {
-
-  let formatDate = fecha + 'T' + hours + timeZone
-  const localDate = new Date(formatDate); // '-06:00' especifica que la hora es UTC-6
-
-  // Convertir a UTC
-  const utcDate = localDate.toISOString(); // Esto te da la fecha en formato UTC (ISO 8601)
-
-  return utcDate
-}
-function convertUTCToLocal(dateUTC) {
-  const date = new Date(dateUTC); // Interpretar la fecha como UTC
-  
-  const hours = date.getUTCHours().toString().padStart(2, '0'); // Asegurar dos dígitos
-  const mins = date.getUTCMinutes().toString().padStart(2, '0'); // Asegurar dos dígitos
-  const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-
-  return `${hours - 8}:${mins}:${seconds}`;
-}
-
-
-
-let hoursArray = (hourStart, hourEnd) => {
-  let result = [];
-
-  for (let i = hourStart; i < hourEnd; i++) {
-    result.push({
-      start_date: i.toString().padStart(2, '0') + ":00:00", // Agrega un '0' si es necesario
-      end_date: (i + 1).toString().padStart(2, '0') + ":00:00"
-    });
-  }
-
-  return result;
-};
-function formatTime(seconds) {
-  let minutes = Math.floor(seconds / 60);
-  let secs = seconds % 60;
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
-}
-
-async function cargarTextPerson(personId, start_date, end_date) {
-
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization: "Basic " + btoa(API_KEY + ":"),
-    },
-  };
-
-  try {
-    let url = `https://api.followupboss.com/v1/textMessages?personId=${personId}?sort=-created&createdAfter=${start_date}&createdBefore=${end_date}`;
-
-    const response = await fetch(url, options);
-
-    if (!response.ok) {
-      throw new Error("Error al obtener los texts");
+    if(enlace.textContent === 'Reportes'){
+      document.getElementById('sheetReports').hidden = false
+      document.getElementById('sheetAgents').hidden = true
+    }else{
+      document.getElementById('sheetReports').hidden = true
+      document.getElementById('sheetAgents').hidden = false
     }
-    const result = await response.json();
-
-    return result
-
-  } catch (error) {
-    console.error("Error:", error);
-    throw new Error("Error al obtener las llamadas: " + error.message);
-  }
-
-
-}
-async function cargarText(listPeerson, start_date, end_date) {
-
-
-  let listId = [...listPeerson]
-
-  if (listId.length !== 0) {
-    // Usar Promise.all() para hacer las solicitudes en paralelo
-    const textMessages = await Promise.all(listId.map(async (personId) => {
-      let cantidad = 0; // Definir cantidad antes de usarla
-
-      if (personId) {
-        // Esperar a que la función cargarTextPerson se resuelva
-        const textmessages = await cargarTextPerson(personId, start_date, end_date);
-
-        // Asegurarse de que textmessages tiene la propiedad _metadata y verificar el total
-        if (textmessages._metadata && textmessages._metadata.total !== 0) {
-          // Filtrar los mensajes donde el userId sea igual al selectAgent.id
-          const filteredMessages = textmessages.filter(message => message.userId === selectAgent.id);
-
-          // Asignar la cantidad de mensajes filtrados
-          cantidad = filteredMessages.length;
-        }
-      }
-      // Retornar la cantidad de mensajes filtrados
-      return cantidad;
-    }));
-    // Mostar el resultado final
-    return textMessages
-  } else {
-    return [0]
-  }
-}
+    enlace.classList.add('active');
+  });
+});
 
 document.getElementById("search").addEventListener("click", async () => {
 
@@ -378,6 +195,52 @@ document.getElementById("search").addEventListener("click", async () => {
   spinner.hidden = true
 });
 
+//!--------------------------------------------------------Funciones de los addEventlistener---------------------------
+
+//TODO--------------------------------------------------------Funciones utiles---------------------------
+
+function convertirDateUTC(fecha, hours, timeZone) {
+
+  let formatDate = fecha + 'T' + hours + timeZone
+  const localDate = new Date(formatDate); // '-06:00' especifica que la hora es UTC-6
+
+  // Convertir a UTC
+  const utcDate = localDate.toISOString(); // Esto te da la fecha en formato UTC (ISO 8601)
+
+  return utcDate
+}
+function convertUTCToLocal(dateUTC) {
+  const date = new Date(dateUTC); // Interpretar la fecha como UTC
+
+  const hours = date.getUTCHours().toString().padStart(2, '0'); // Asegurar dos dígitos
+  const mins = date.getUTCMinutes().toString().padStart(2, '0'); // Asegurar dos dígitos
+  const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+  return `${hours - 8}:${mins}:${seconds}`;
+}
+
+
+let hoursArray = (hourStart, hourEnd) => {
+  let result = [];
+
+  for (let i = hourStart; i < hourEnd; i++) {
+    result.push({
+      start_date: i.toString().padStart(2, '0') + ":00:00", // Agrega un '0' si es necesario
+      end_date: (i + 1).toString().padStart(2, '0') + ":00:00"
+    });
+  }
+
+  return result;
+};
+function formatTime(seconds) {
+  let minutes = Math.floor(seconds / 60);
+  let secs = seconds % 60;
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+//TODO--------------------------------------------------------Funciones utiles---------------------------
+
+//!-----------------------------------------------------------Funciones renderizar datos---------------------------
 
 function renderizarDatos(data) {
 
@@ -405,17 +268,6 @@ function renderizarDatos(data) {
     row.style.cursor = 'pointer'
     tbody.appendChild(row);
   });
-  //resumen
-  /* const row = document.createElement("tr");
-   row.innerHTML = `
-         <td>Resumen</td>
-         <td>${calls.length}</td>
-         <td>${calls.length}</td>
-         <td>${calls.length}</td>
-     `;
-   row.className = 'fila_resumen'
-   tbody.appendChild(row);*/
-
 }
 
 function renderizarDatosModal(timeFrame, data) {
@@ -432,3 +284,157 @@ function renderizarDatosModal(timeFrame, data) {
   });
 
 }
+
+//!-----------------------------------------------------------Funciones renderizar datos---------------------------
+
+async function buscar() {
+  // Obtener la opción seleccionada y la fecha
+  const optionSelected = selectAgent.options[selectAgent.selectedIndex];
+  let selectedDate = document.getElementById("start_date").value;
+
+  let calls = [];
+
+  // Definir el día específico y la zona horaria
+  const diaEspecifico = selectedDate;
+  const zonaHoraria = 6; // Ajuste de zona horaria  
+
+  // Crear fechas de inicio y fin del día en UTC
+  const inicioDia = new Date(`${diaEspecifico}T00:00:00Z`);
+  const finDia = new Date(`${diaEspecifico}T23:59:59Z`);
+
+  // Ajustar las fechas según la zona horaria
+  const inicioAjustado = new Date(
+    inicioDia.getTime() + (zonaHoraria * 60 * 60 * 1000)
+  );
+  const finAjustado = new Date(
+    finDia.getTime() + (zonaHoraria * 60 * 60 * 1000)
+  );
+
+  // Convertir a formato ISO (UTC)
+  const inicioUTC = inicioAjustado.toISOString();
+  const finUTC = finAjustado.toISOString();
+
+  const bodyData = {
+    id: Number(optionSelected.id),
+    inicioUTC: inicioUTC,
+    finUTC: finUTC
+  }
+  const url = `${servidor}/api/reportingFabio/searchCalls`
+  const options = {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(bodyData), // Enviar el cuerpo de la solicitud
+  };
+
+  try {
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al buscar llamadas:", error);
+    throw error;
+  }
+  /*const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization: "Basic " + btoa(API_KEY + ":"),
+    },
+  };
+  try {
+    let url = `https://api.followupboss.com/v1/calls?sort=-created&createdAfter=${inicioUTC}&createdBefore=${finUTC}&limit=100`;
+
+    while (url) {
+      const response = await fetch(url, options);
+
+      if (!response.ok) {
+        throw new Error("Error al obtener las llamadas");
+      }
+
+      const result = await response.json();
+      const data = result.calls;
+
+      // Agregar los datos al array de llamadas
+      calls.push(...data.filter(call => call.userId === Number(optionSelected.id)
+      ));
+
+      // Obtener la URL de la próxima página
+      url = result._metadata.nextLink;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("Error al obtener las llamadas: " + error.message);
+  }
+
+  return calls; // Retornar las llamadas para su uso posterior*/
+}
+
+async function cargarTextPerson(personId, start_date, end_date) {
+
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization: "Basic " + btoa(API_KEY + ":"),
+    },
+  };
+
+  try {
+    let url = `https://api.followupboss.com/v1/textMessages?personId=${personId}?sort=-created&createdAfter=${start_date}&createdBefore=${end_date}`;
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error("Error al obtener los texts");
+    }
+    const result = await response.json();
+
+    return result
+
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("Error al obtener las llamadas: " + error.message);
+  }
+
+
+}
+async function cargarText(listPeerson, start_date, end_date) {
+
+
+  let listId = [...listPeerson]
+
+  if (listId.length !== 0) {
+    // Usar Promise.all() para hacer las solicitudes en paralelo
+    const textMessages = await Promise.all(listId.map(async (personId) => {
+      let cantidad = 0; // Definir cantidad antes de usarla
+
+      if (personId) {
+        // Esperar a que la función cargarTextPerson se resuelva
+        const textmessages = await cargarTextPerson(personId, start_date, end_date);
+
+        // Asegurarse de que textmessages tiene la propiedad _metadata y verificar el total
+        if (textmessages._metadata && textmessages._metadata.total !== 0) {
+          // Filtrar los mensajes donde el userId sea igual al selectAgent.id
+          const filteredMessages = textmessages.filter(message => message.userId === selectAgent.id);
+
+          // Asignar la cantidad de mensajes filtrados
+          cantidad = filteredMessages.length;
+        }
+      }
+      // Retornar la cantidad de mensajes filtrados
+      return cantidad;
+    }));
+    // Mostar el resultado final
+    return textMessages
+  } else {
+    return [0]
+  }
+}
+
