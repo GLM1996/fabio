@@ -1,5 +1,4 @@
 //import { timeFrame } from "./util.js";
-
 const servidor = 'https://backendembededapp.onrender.com'
 //const servidor = 'http://localhost:5500'
 
@@ -73,10 +72,10 @@ enlaces.forEach(enlace => {
     if (enlaceActivo) {
       enlaceActivo.classList.remove('active'); // Solo si existe
     }
-    if(enlace.textContent === 'Reportes'){
+    if (enlace.textContent === 'Reportes') {
       document.getElementById('sheetReports').hidden = false
       document.getElementById('sheetAgents').hidden = true
-    }else{
+    } else {
       document.getElementById('sheetReports').hidden = true
       document.getElementById('sheetAgents').hidden = false
     }
@@ -145,8 +144,6 @@ document.getElementById("search").addEventListener("click", async () => {
             callConversation++
           }
           talkTime += call.duration
-
-
         }
       } else {
         if (banderaCall) {
@@ -165,8 +162,36 @@ document.getElementById("search").addEventListener("click", async () => {
         }
       }
     }
-    //textMessages = await cargarText(uniquePersons, start_date, end_date); // Esperar el resultado
-    //let cantTextMessages = textMessages.reduce((acc, currentValue) => acc + currentValue, 0);
+    let dataTime = ajustarFechaTimeFrame(timeFrame[i])
+    if (uniquePersons.size !== 0) {
+      let listId = [...uniquePersons]
+      try {
+        const url = `${servidor}/api/reportingFabio/searchTextMessages`
+        const options = {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'content-type': 'application/json'
+          }, body: JSON.stringify({
+            listId: listId,
+            inicioUTC: dataTime.inicioUTC,
+            finUTC: dataTime.finUTC
+          })
+        };
+        const response = await fetch(url, options)
+        if (!response.ok) {
+          throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+        const data = await response.json();
+        textMessages = data
+      } catch (error) {
+        console.error("Error al buscar textMessages:", error);
+        throw error;
+      }
+    } else {
+      textMessages = []
+    }
+
     const clientIntent = uniquePersons.size;
 
     callFilters.push({
@@ -176,7 +201,7 @@ document.getElementById("search").addEventListener("click", async () => {
       'calls': callFind,
       'clientIntent': clientIntent,
       'clientTarget': clientTarget,
-      'textMessages': 0
+      'textMessages': textMessages
     })
 
     calls = remainingCall
@@ -202,12 +227,12 @@ document.getElementById("search").addEventListener("click", async () => {
 function convertirDateUTC(fecha, hours, timeZone) {
 
   let formatDate = fecha + 'T' + hours + timeZone
-  const localDate = new Date(formatDate); // '-06:00' especifica que la hora es UTC-6
+  //const localDate = new Date(formatDate); // '-06:00' especifica que la hora es UTC-6
 
   // Convertir a UTC
-  const utcDate = localDate.toISOString(); // Esto te da la fecha en formato UTC (ISO 8601)
+  //const utcDate = localDate.toISOString(); // Esto te da la fecha en formato UTC (ISO 8601)
 
-  return utcDate
+  return formatDate
 }
 function convertUTCToLocal(dateUTC) {
   const date = new Date(dateUTC); // Interpretar la fecha como UTC
@@ -237,62 +262,10 @@ function formatTime(seconds) {
   let secs = seconds % 60;
   return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
-
-//TODO--------------------------------------------------------Funciones utiles---------------------------
-
-//!-----------------------------------------------------------Funciones renderizar datos---------------------------
-
-function renderizarDatos(data) {
-
-  data.forEach(item => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-        <td>${item.agent /*Name Agente*/}</td>
-        <td>${item.timeFrame /*Horario del Dia*/}</td>
-        <td>${formatTime(item.timeCall) /*Tiempo de Llamada*/}</td>
-        <td>${item.calls.length /*Intentos*/}</td>
-        <td>${item.clientIntent /*Clientes Intentados*/}</td>
-        <td>${item.clientTarget /*Clientes Alcanzados*/}</td> 
-        <td>${item.textMessages /*Contador de mensajes*/}</td> 
-        <td>${item.clientIntent > 0 ? (item.calls.length / item.clientIntent).toFixed(2) : 0 /*Intentos x clientes*/}</td>
-        <td>${item.clientIntent > 0 && item.clientTarget > 0 ? (item.clientTarget / item.clientIntent).toFixed(2) : 0 /*Contactabilidad */}</td> 
-        <td>${((item.calls.length * ringTime) + (item.clientIntent * wrapUp) + (0 * textTime) + (item.timeCall / 60)).toFixed(2)/*Tiempo de gestion */}</td>
-        <td>Not Yet</td>
-    `;
-
-    row.addEventListener('click', () => {
-      renderizarDatosModal(item.timeFrame, item.calls)
-      const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
-      modal.show();
-    })
-    row.style.cursor = 'pointer'
-    tbody.appendChild(row);
-  });
-}
-
-function renderizarDatosModal(timeFrame, data) {
-  tbodyModal.innerHTML = ''
-  document.getElementById('modalTitle').textContent = `Horario: ${timeFrame}`
-  data.forEach(item => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-        <td><a href="https://homelasvegasnevada.followupboss.com/2/people/view/${item.personId}" target="_blank">${item.name}</a></td>
-        <td>${item.duration}</td>
-        <td>${item.startedAt ? convertUTCToLocal(item.startedAt) : ''}</td>
-    `;
-    tbodyModal.appendChild(row);
-  });
-
-}
-
-//!-----------------------------------------------------------Funciones renderizar datos---------------------------
-
-async function buscar() {
+function ajustarFecha() {
   // Obtener la opción seleccionada y la fecha
-  const optionSelected = selectAgent.options[selectAgent.selectedIndex];
-  let selectedDate = document.getElementById("start_date").value;
 
-  let calls = [];
+  let selectedDate = document.getElementById("start_date").value;
 
   // Definir el día específico y la zona horaria
   const diaEspecifico = selectedDate;
@@ -313,6 +286,106 @@ async function buscar() {
   // Convertir a formato ISO (UTC)
   const inicioUTC = inicioAjustado.toISOString();
   const finUTC = finAjustado.toISOString();
+
+  return { inicioUTC: inicioUTC, finUTC: finUTC }
+}
+function ajustarFechaTimeFrame(timeFrame) {
+  // Obtener la opción seleccionada y la fecha
+
+  let selectedDate = document.getElementById("start_date").value;
+
+  // Definir el día específico y la zona horaria
+  const diaEspecifico = selectedDate;
+  const zonaHoraria = 8; // Ajuste de zona horaria  
+
+  // Crear fechas de inicio y fin del día en UTC
+  const inicioDia = new Date(`${diaEspecifico}T${timeFrame.start_date}Z`);
+  const finDia = new Date(`${diaEspecifico}T${timeFrame.end_date}Z`);
+
+  // Ajustar las fechas según la zona horaria
+  const inicioAjustado = new Date(
+    inicioDia.getTime() + (zonaHoraria * 60 * 60 * 1000)
+  );
+  const finAjustado = new Date(
+    finDia.getTime() + (zonaHoraria * 60 * 60 * 1000)
+  );
+
+  // Convertir a formato ISO (UTC)
+  const inicioUTC = inicioAjustado.toISOString();
+  const finUTC = finAjustado.toISOString();
+
+  return { inicioUTC: inicioUTC, finUTC: finUTC }
+}
+
+//TODO--------------------------------------------------------Funciones utiles---------------------------
+
+//!-----------------------------------------------------------Funciones renderizar datos---------------------------
+
+function renderizarDatos(data) {
+
+  data.forEach(item => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${item.agent /*Name Agente*/}</td>
+        <td>${item.timeFrame /*Horario del Dia*/}</td>
+        <td>${formatTime(item.timeCall) /*Tiempo de Llamada*/}</td>
+        <td>${item.calls.length /*Intentos*/}</td>
+        <td>${item.clientIntent /*Clientes Intentados*/}</td>
+        <td>${item.clientTarget /*Clientes Alcanzados*/}</td> 
+        <td>${item.textMessages.length /*Contador de mensajes*/}</td> 
+        <td>${item.clientIntent > 0 ? (item.calls.length / item.clientIntent).toFixed(2) : 0 /*Intentos x clientes*/}</td>
+        <td>${item.clientIntent > 0 && item.clientTarget > 0 ? (item.clientTarget / item.clientIntent).toFixed(2) : 0 /*Contactabilidad */}</td> 
+        <td>${((item.calls.length * ringTime) + (item.clientIntent * wrapUp) + (item.textMessages.length * textTime) + (item.timeCall / 60)).toFixed(2)/*Tiempo de gestion */}</td>
+        <td>${(((item.calls.length * ringTime) + (item.clientIntent * wrapUp) + (item.textMessages.length * textTime) + (item.timeCall / 60)) / 0.6).toFixed(2)/*Ocupancy */} %</td>
+    `;
+
+    row.addEventListener('click', () => {
+      renderizarDatosModal(item.timeFrame, item.calls, item.textMessages)
+      const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+      modal.show();
+    })
+    row.style.cursor = 'pointer'
+    tbody.appendChild(row);
+  });
+}
+
+function renderizarDatosModal(timeFrame, data, dataMessages) {
+  
+  tbodyModal.innerHTML = ''
+  document.getElementById('modalTitle').textContent = `Horario: ${timeFrame}`
+
+  let dataMessagesSet = new Set()
+
+  data.forEach(item => {
+    let messages = [];
+
+    // Verificamos si ya hemos procesado este `personId`
+    if (!dataMessagesSet.has(item.personId)) {
+      dataMessagesSet.add(item.personId); // Agregar el `personId` al `Set`
+      messages = dataMessages.filter(msg => msg.personId === item.personId);
+    } else {
+      messages = [];
+    }
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td><a href="https://homelasvegasnevada.followupboss.com/2/people/view/${item.personId}" target="_blank">${item.name}</a></td>
+        <td>${item.duration}</td>
+        <td>${item.startedAt ? convertUTCToLocal(item.startedAt) : ''}</td>
+        <td>${messages.length ? messages.length : 0}</td>
+    `;
+    tbodyModal.appendChild(row);
+  });
+
+}
+
+//!-----------------------------------------------------------Funciones renderizar datos---------------------------
+
+
+async function buscar() {
+  const optionSelected = selectAgent.options[selectAgent.selectedIndex];
+  let data = ajustarFecha()
+  let inicioUTC = data.inicioUTC
+  let finUTC = data.finUTC
 
   const bodyData = {
     id: Number(optionSelected.id),
@@ -341,100 +414,8 @@ async function buscar() {
     console.error("Error al buscar llamadas:", error);
     throw error;
   }
-  /*const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization: "Basic " + btoa(API_KEY + ":"),
-    },
-  };
-  try {
-    let url = `https://api.followupboss.com/v1/calls?sort=-created&createdAfter=${inicioUTC}&createdBefore=${finUTC}&limit=100`;
-
-    while (url) {
-      const response = await fetch(url, options);
-
-      if (!response.ok) {
-        throw new Error("Error al obtener las llamadas");
-      }
-
-      const result = await response.json();
-      const data = result.calls;
-
-      // Agregar los datos al array de llamadas
-      calls.push(...data.filter(call => call.userId === Number(optionSelected.id)
-      ));
-
-      // Obtener la URL de la próxima página
-      url = result._metadata.nextLink;
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    throw new Error("Error al obtener las llamadas: " + error.message);
-  }
-
-  return calls; // Retornar las llamadas para su uso posterior*/
-}
-
-async function cargarTextPerson(personId, start_date, end_date) {
-
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization: "Basic " + btoa(API_KEY + ":"),
-    },
-  };
-
-  try {
-    let url = `https://api.followupboss.com/v1/textMessages?personId=${personId}?sort=-created&createdAfter=${start_date}&createdBefore=${end_date}`;
-
-    const response = await fetch(url, options);
-
-    if (!response.ok) {
-      throw new Error("Error al obtener los texts");
-    }
-    const result = await response.json();
-
-    return result
-
-  } catch (error) {
-    console.error("Error:", error);
-    throw new Error("Error al obtener las llamadas: " + error.message);
-  }
-
 
 }
-async function cargarText(listPeerson, start_date, end_date) {
 
 
-  let listId = [...listPeerson]
-
-  if (listId.length !== 0) {
-    // Usar Promise.all() para hacer las solicitudes en paralelo
-    const textMessages = await Promise.all(listId.map(async (personId) => {
-      let cantidad = 0; // Definir cantidad antes de usarla
-
-      if (personId) {
-        // Esperar a que la función cargarTextPerson se resuelva
-        const textmessages = await cargarTextPerson(personId, start_date, end_date);
-
-        // Asegurarse de que textmessages tiene la propiedad _metadata y verificar el total
-        if (textmessages._metadata && textmessages._metadata.total !== 0) {
-          // Filtrar los mensajes donde el userId sea igual al selectAgent.id
-          const filteredMessages = textmessages.filter(message => message.userId === selectAgent.id);
-
-          // Asignar la cantidad de mensajes filtrados
-          cantidad = filteredMessages.length;
-        }
-      }
-      // Retornar la cantidad de mensajes filtrados
-      return cantidad;
-    }));
-    // Mostar el resultado final
-    return textMessages
-  } else {
-    return [0]
-  }
-}
 
