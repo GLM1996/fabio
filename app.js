@@ -1,7 +1,11 @@
-//import { timeFrame } from "./util.js";
+
 const servidor = 'https://backendembededapp.onrender.com'
 //const servidor = 'http://localhost:5500'
 
+
+var config;
+var ctx_bar = document.getElementById('grafica_barra').getContext('2d');
+var miGrafica_bar = new Chart(ctx_bar, config);
 
 let agents = [];
 let agentSelected = [];
@@ -9,6 +13,8 @@ let calls
 
 
 const selectAgent = document.getElementById("select_agent");
+const selectAgentGrphic = document.getElementById("select_agent_graphic")
+
 const tbody = document.getElementById('tablaDatos')
 const tbodyModal = document.getElementById('tablaDatosModal')
 const spinner = document.getElementById('spinner')
@@ -54,7 +60,13 @@ function cargarSelectAgent() {
     option.setAttribute("id", agents[i].id);
     option.textContent = agents[i].name;
 
+    const option1 = document.createElement("option");
+
+    option1.setAttribute("id", agents[i].id);
+    option1.textContent = agents[i].name;
+
     selectAgent.appendChild(option);
+    selectAgentGrphic.appendChild(option1);
   }
 }
 
@@ -75,6 +87,7 @@ enlaces.forEach(enlace => {
     if (enlace.textContent === 'Reportes') {
       document.getElementById('sheetReports').hidden = false
       document.getElementById('sheetAgents').hidden = true
+
     } else {
       document.getElementById('sheetReports').hidden = true
       document.getElementById('sheetAgents').hidden = false
@@ -350,7 +363,7 @@ function renderizarDatos(data) {
 }
 
 function renderizarDatosModal(timeFrame, data, dataMessages) {
-  
+
   tbodyModal.innerHTML = ''
   document.getElementById('modalTitle').textContent = `Horario: ${timeFrame}`
 
@@ -417,5 +430,55 @@ async function buscar() {
 
 }
 
+//TODO------------------------------------------Graficas
+function GraficBara(ctx_bar) {
+  const labels = ['a', 'b', 'b'];
 
+  const data = {
+    labels: labels,
+    datasets: [{
+      label: 'My First Dataset',
+      data: [65, 59, 80, 81, 56, 55, 40],
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(255, 159, 64, 0.2)',
+        'rgba(255, 205, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(201, 203, 207, 0.2)'
+      ],
+      borderColor: [
+        'rgb(255, 99, 132)',
+        'rgb(255, 159, 64)',
+        'rgb(255, 205, 86)',
+        'rgb(75, 192, 192)',
+        'rgb(54, 162, 235)',
+        'rgb(153, 102, 255)',
+        'rgb(201, 203, 207)'
+      ],
+      borderWidth: 1
+    }]
+  };
 
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    },
+  };
+
+  return new Chart(ctx_bar, config);;
+}
+
+document.getElementById('graphic').addEventListener('click', () => {
+  let timeFrame = hoursArray(Number(document.getElementById('start_hours_graphic').value), Number(document.getElementById('end_hours_graphic').value))
+    
+  miGrafica_bar.destroy()
+  miGrafica_bar = GraficBara(ctx_bar);
+})

@@ -13,6 +13,8 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <link rel="stylesheet" href="style.css?v-3" />
 </head>
 
@@ -93,12 +95,13 @@
     </div>
     <div class="col-12 mt-2 d-flex gap-2 justify-content-center align-items-center">
       <button class="btn btn-primary" id="search">Search</button>
-      <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample"
-        aria-expanded="false" aria-controls="collapseExample" id="summary" hidden>
+      <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSummary"
+        aria-expanded="false" aria-controls="collapseSummary" id="summary" hidden>
         Summary
       </button>
     </div>
-    <div class="collapse my-1" id="collapseExample">
+    <!--Collapse para Summary-->
+    <div class="collapse my-1" id="collapseSummary">
       <div class="card card-body">
         <div class="d-flex flex-wrap gap-2 justify-content-between">
           <div
@@ -132,6 +135,7 @@
         </div>
       </div>
     </div>
+     
     <div class="col-12" id="spinner" hidden>
       <div class="d-flex gap-2 justify-content-center m-2 p-2">
         <div class="spinner-border text-primary" role="status"></div>
@@ -196,12 +200,46 @@
         </div>
       </div>
     </div>
-
   </div>
   <div class="row w-100 m-auto p-4" id="sheetReports" hidden>
-    hoja de reportes
-  </div>
-  <script type="module" src="app.js?v-3"></script>
+    <div class="col-12 col-lg-2">
+      <label for="">Select the Agent</label>
+      <select class="form-select form-select-sm" aria-label="Default select example" id="select_agent_graphic"></select>
+    </div>
+    <div class="col-12 col-lg-2">
+      <label for="">Select Date</label>
+      <div class="input-group input-group-sm mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default">Date</span>
+        <input type="date" id="start_date_graphic" class="form-control form-control-sm" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default">
+      </div>
+    </div>
+    <div class="col-12 col-lg-2">
+      <label for="">Hours Start</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="start_hours_graphic" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="9">
+      </div>
+    </div>
+    <div class="col-12 col-lg-2">
+      <label for="">Hours End</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="end_hours_graphic" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="18">
+      </div>
+    </div>
+    <div class="col-12 m-2 d-flex justify-content-center align-items-center">        
+      <button class="btn btn-success" type="button" id="graphic">
+        Graphic
+      </button>
+    </div>
+    <div class="col-12">
+      <canvas id="grafica_barra"></canvas>
+    </div>
+  </div> 
+  <script type="module"  src="app.js?v-3"></script>
 </body>
 
 </html>

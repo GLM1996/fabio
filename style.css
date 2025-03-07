@@ -45,3 +45,14 @@ table thead {
     background-color: gray;
     border-radius: 5px;
  }
+ 
+ #sheetReports .container {
+    width: 100%; /* Limita el tamaño del canvas */
+    margin: auto; /* Centrar */
+  }
+  
+  #grafica_barra {
+    width: 600px !important;
+    height: 300px !important; /* Altura controlada */
+    margin: auto;
+  }
