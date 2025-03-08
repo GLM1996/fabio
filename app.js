@@ -1,7 +1,5 @@
-
 const servidor = 'https://backendembededapp.onrender.com'
 //const servidor = 'http://localhost:5500'
-
 
 var config;
 var ctx_bar = document.getElementById('grafica_barra').getContext('2d');
@@ -10,7 +8,6 @@ var miGrafica_bar = new Chart(ctx_bar, config);
 let agents = [];
 let agentSelected = [];
 let calls
-
 
 const selectAgent = document.getElementById("select_agent");
 const selectAgentGrphic = document.getElementById("select_agent_graphic")
@@ -23,9 +20,9 @@ const textTime = Number(document.getElementById('text_time').value)
 const wrapUp = Number(document.getElementById('wrap_up').value)
 const ringTime = Number(document.getElementById('ring_time').value)
 
-
 //TODO-----------------------------------------------------Funciones al cargar la pagina-------------------------------
 
+//Se ejecuta al cargar el HTML
 document.addEventListener("DOMContentLoaded", async () => {
   let fecha = new Date();
   //fecha.setDate(fecha.getDate() - 1); // Restar un día
@@ -39,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   cargarSelectAgent();
   await getReport()
 });
-
+//Obtiene los agentes de Follow Boss del Grupo VA
 async function getAgents() {
   const url = `${servidor}/api/reportingFabio/searchAgents`
   try {
@@ -53,7 +50,7 @@ async function getAgents() {
 
   }
 }
-
+//Llena los select con los nombres de los Agentes
 function cargarSelectAgent() {
   for (let i = 0; i < agents.length; i++) {
     const option = document.createElement("option");
@@ -70,6 +67,7 @@ function cargarSelectAgent() {
     selectAgentGrphic.appendChild(option1);
   }
 }
+//Optiene la configuracion guardada de H start, H end .... desde Mongo DB
 async function getReport() {
   try {
       // Petición GET al servidor
@@ -102,6 +100,7 @@ async function getReport() {
 
 //!--------------------------------------------------------Funciones de los addEventlistener---------------------------
 
+//Para controlar el comportamiento de los link del menu
 let enlaces = document.querySelectorAll('.nav-link');
 
 enlaces.forEach(enlace => {
@@ -123,7 +122,7 @@ enlaces.forEach(enlace => {
     enlace.classList.add('active');
   });
 });
-
+//Se encarga de realizar las busquedas
 document.getElementById("search").addEventListener("click", async () => {
 
   tbody.innerHTML = ''
@@ -284,8 +283,7 @@ function convertUTCToLocal(dateUTC) {
 
   return `${hours - 8}:${mins}:${seconds}`;
 }
-
-
+//Crea los time frame o horarios Ej: 09:00:00 - 10:00:00
 let hoursArray = (hourStart, hourEnd) => {
   let result = [];
 
@@ -298,14 +296,15 @@ let hoursArray = (hourStart, hourEnd) => {
 
   return result;
 };
+//Convierte de segundos a minutos
 function formatTime(seconds) {
   let minutes = Math.floor(seconds / 60);
   let secs = seconds % 60;
   return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
+//Ajusta la fecha a formato UTC
 function ajustarFecha() {
   // Obtener la opción seleccionada y la fecha
-
   let selectedDate = document.getElementById("start_date").value;
 
   // Definir el día específico y la zona horaria
@@ -362,6 +361,7 @@ function ajustarFechaTimeFrame(timeFrame) {
 
 //!-----------------------------------------------------------Funciones renderizar datos---------------------------
 
+//Llena los datos de la tabla principal
 function renderizarDatos(data) {
 
   data.forEach(item => {
@@ -389,7 +389,7 @@ function renderizarDatos(data) {
     tbody.appendChild(row);
   });
 }
-
+//Llena los datos de la tabla del modal
 function renderizarDatosModal(timeFrame, data, dataMessages) {
 
   tbodyModal.innerHTML = ''
@@ -421,7 +421,7 @@ function renderizarDatosModal(timeFrame, data, dataMessages) {
 
 //!-----------------------------------------------------------Funciones renderizar datos---------------------------
 
-
+//funcion que busca las calls solicitando al servidor
 async function buscar() {
   const optionSelected = selectAgent.options[selectAgent.selectedIndex];
   let data = ajustarFecha()
@@ -458,7 +458,9 @@ async function buscar() {
 
 }
 
-//TODO------------------------------------------Graficas
+//TODO------------------------------------------Graficas---------------------------------------------
+
+//Metodod para graficar
 function GraficBara(ctx_bar) {
   const labels = ['a', 'b', 'b'];
 
@@ -511,6 +513,11 @@ document.getElementById('graphic').addEventListener('click', () => {
   miGrafica_bar = GraficBara(ctx_bar);
 })
 
+//TODO------------------------------------------Graficas---------------------------------------------
+
+//*---------------------------------------------MONGO DB----------------------------------------------
+
+//Salva la nueva configuracion en Mongo DB
 let saveConfig = document.getElementById('save_config')
 
 saveConfig.addEventListener("click", async () => {
@@ -544,6 +551,7 @@ saveConfig.addEventListener("click", async () => {
       alert("Error al enviar los datos: " + error.message);
   }
 });
+//Muestra el mensaje 
 function showToast(message, valor) {
   const toast = document.getElementById('text-oculto');
   toast.textContent = message;
@@ -564,4 +572,6 @@ function showToast(message, valor) {
       }, 300); // Tiempo de la animación de desvanecimiento
   }, 3000); // Mostrar durante 3 segundos
 }
+
+//*---------------------------------------------MONGO DB----------------------------------------------
 
