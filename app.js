@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   agents = await getAgents();
   cargarSelectAgent();
+  await getReport()
 });
 
 async function getAgents() {
@@ -67,6 +68,33 @@ function cargarSelectAgent() {
 
     selectAgent.appendChild(option);
     selectAgentGrphic.appendChild(option1);
+  }
+}
+async function getReport() {
+  try {
+      // Petición GET al servidor
+      const url = `${servidor}/api/mongoose/agentReport/getReport`
+      const response = await fetch(url);
+      const result = await response.json();
+
+      if (response.ok) {
+          // Rellenar los inputs con los datos recibidos
+          document.getElementById("start_hours").value = result.hoursStart;
+          document.getElementById("end_hours").value = result.hoursEnd;
+          document.getElementById("text_time").value = result.textTime;
+          document.getElementById("wrap_up").value = result.wrapUp;
+          document.getElementById("ring_time").value = result.ringTime;
+
+          document.getElementById("start_hours_config").value = result.hoursStart;
+          document.getElementById("end_hours_config").value = result.hoursEnd;
+          document.getElementById("text_time_config").value = result.textTime;
+          document.getElementById("wrap_up_config").value = result.wrapUp;
+          document.getElementById("ring_time_config").value = result.ringTime;
+      } else {
+          console.log("No se encontró el reporte.");
+      }
+  } catch (error) {
+    console.log("Error al obtener el reporte: " + error.message);
   }
 }
 
@@ -482,3 +510,58 @@ document.getElementById('graphic').addEventListener('click', () => {
   miGrafica_bar.destroy()
   miGrafica_bar = GraficBara(ctx_bar);
 })
+
+let saveConfig = document.getElementById('save_config')
+
+saveConfig.addEventListener("click", async () => {
+  // Capturar valores de los inputs
+  const data = {
+      hoursStart: parseFloat(document.getElementById("start_hours_config").value),
+      hoursEnd: parseFloat(document.getElementById("end_hours_config").value),
+      textTime: parseFloat(document.getElementById("text_time_config").value),
+      wrapUp: parseFloat(document.getElementById("wrap_up_config").value),
+      ringTime: parseFloat(document.getElementById("ring_time_config").value)
+  };
+
+  try {
+      // Petición POST al servidor
+      const url = `${servidor}/api/mongoose/agentReport/update`
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      }
+      const response = await fetch(url, options);
+     
+      if (response.ok) {
+        showToast('Config saved', 0)
+      } else {
+        showToast(`Error: ${response.status} Error: ${response.statusText}`, 1)
+      }
+  } catch (error) {
+      alert("Error al enviar los datos: " + error.message);
+  }
+});
+function showToast(message, valor) {
+  const toast = document.getElementById('text-oculto');
+  toast.textContent = message;
+  toast.style.display = 'flex';
+
+  if (valor === 0) {
+      toast.style.color = 'green'
+  } else {
+      toast.style.color = 'darkred'
+  }
+
+  // Desvanecer y ocultar el toast después de 3 segundos
+  setTimeout(() => {
+      toast.style.opacity = '0'; // Desvanecer el toast
+      setTimeout(() => {
+          toast.style.display = 'none'; // Ocultar el toast completamente
+          toast.style.opacity = '1'; // Restablecer la opacidad para el siguiente uso
+      }, 300); // Tiempo de la animación de desvanecimiento
+  }, 3000); // Mostrar durante 3 segundos
+}
+

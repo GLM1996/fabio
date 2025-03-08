@@ -56,3 +56,22 @@ table thead {
     height: 300px !important; /* Altura controlada */
     margin: auto;
   }
+
+  .fixed-btn {
+    position: fixed;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    z-index: 1000;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.toast {
+    display: none;
+    justify-content: center;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s ease;
+}
