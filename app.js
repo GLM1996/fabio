@@ -1,5 +1,5 @@
-const servidor = 'https://backendembededapp.onrender.com'
-//const servidor = 'http://localhost:5500'
+//const servidor = 'https://backendembededapp.onrender.com'
+const servidor = 'http://localhost:5500'
 
 var config;
 var ctx_bar = document.getElementById('grafica_barra').getContext('2d');
@@ -16,9 +16,9 @@ const tbody = document.getElementById('tablaDatos')
 const tbodyModal = document.getElementById('tablaDatosModal')
 const spinner = document.getElementById('spinner')
 
-const textTime = Number(document.getElementById('text_time').value)
-const wrapUp = Number(document.getElementById('wrap_up').value)
-const ringTime = Number(document.getElementById('ring_time').value)
+let textTime = Number(document.getElementById('text_time').value)
+let wrapUp = Number(document.getElementById('wrap_up').value)
+let ringTime = Number(document.getElementById('ring_time').value)
 
 //TODO-----------------------------------------------------Funciones al cargar la pagina-------------------------------
 
@@ -70,27 +70,28 @@ function cargarSelectAgent() {
 //Optiene la configuracion guardada de H start, H end .... desde Mongo DB
 async function getReport() {
   try {
-      // Petición GET al servidor
-      const url = `${servidor}/api/mongoose/agentReport/getReport`
-      const response = await fetch(url);
-      const result = await response.json();
+    // Petición GET al servidor
+    const url = `${servidor}/api/mongoose/agentReport/getReport`
+    const response = await fetch(url);
+    const result = await response.json();
 
-      if (response.ok) {
-          // Rellenar los inputs con los datos recibidos
-          document.getElementById("start_hours").value = result.hoursStart;
-          document.getElementById("end_hours").value = result.hoursEnd;
-          document.getElementById("text_time").value = result.textTime;
-          document.getElementById("wrap_up").value = result.wrapUp;
-          document.getElementById("ring_time").value = result.ringTime;
+    if (response.ok) {
+      // Rellenar los inputs con los datos recibidos
+      document.getElementById("start_hours").value = result.hoursStart;
+      document.getElementById("end_hours").value = result.hoursEnd;
+      document.getElementById("text_time").value = result.textTime;
+      document.getElementById("wrap_up").value = result.wrapUp;
+      document.getElementById("ring_time").value = result.ringTime;
 
-          document.getElementById("start_hours_config").value = result.hoursStart;
-          document.getElementById("end_hours_config").value = result.hoursEnd;
-          document.getElementById("text_time_config").value = result.textTime;
-          document.getElementById("wrap_up_config").value = result.wrapUp;
-          document.getElementById("ring_time_config").value = result.ringTime;
-      } else {
-          console.log("No se encontró el reporte.");
-      }
+      document.getElementById("start_hours_config").value = result.hoursStart;
+      document.getElementById("end_hours_config").value = result.hoursEnd;
+      document.getElementById("text_time_config").value = result.textTime;
+      document.getElementById("wrap_up_config").value = result.wrapUp;
+      document.getElementById("ring_time_config").value = result.ringTime;
+
+    } else {
+      console.log("No se encontró el reporte.");
+    }
   } catch (error) {
     console.log("Error al obtener el reporte: " + error.message);
   }
@@ -133,6 +134,10 @@ document.getElementById("search").addEventListener("click", async () => {
   let timeZone = '-08:00'
   let callFilters = []
   let calls = await buscar();
+
+  textTime = Number(document.getElementById('text_time').value)
+  wrapUp = Number(document.getElementById('wrap_up').value)
+  ringTime = Number(document.getElementById('ring_time').value)
 
   //Llenando datos summary
   let callMade = 0
@@ -508,7 +513,7 @@ function GraficBara(ctx_bar) {
 
 document.getElementById('graphic').addEventListener('click', () => {
   let timeFrame = hoursArray(Number(document.getElementById('start_hours_graphic').value), Number(document.getElementById('end_hours_graphic').value))
-    
+
   miGrafica_bar.destroy()
   miGrafica_bar = GraficBara(ctx_bar);
 })
@@ -523,32 +528,32 @@ let saveConfig = document.getElementById('save_config')
 saveConfig.addEventListener("click", async () => {
   // Capturar valores de los inputs
   const data = {
-      hoursStart: parseFloat(document.getElementById("start_hours_config").value),
-      hoursEnd: parseFloat(document.getElementById("end_hours_config").value),
-      textTime: parseFloat(document.getElementById("text_time_config").value),
-      wrapUp: parseFloat(document.getElementById("wrap_up_config").value),
-      ringTime: parseFloat(document.getElementById("ring_time_config").value)
+    hoursStart: parseFloat(document.getElementById("start_hours_config").value),
+    hoursEnd: parseFloat(document.getElementById("end_hours_config").value),
+    textTime: parseFloat(document.getElementById("text_time_config").value),
+    wrapUp: parseFloat(document.getElementById("wrap_up_config").value),
+    ringTime: parseFloat(document.getElementById("ring_time_config").value)
   };
 
   try {
-      // Petición POST al servidor
-      const url = `${servidor}/api/mongoose/agentReport/update`
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      }
-      const response = await fetch(url, options);
-     
-      if (response.ok) {
-        showToast('Config saved', 0)
-      } else {
-        showToast(`Error: ${response.status} Error: ${response.statusText}`, 1)
-      }
+    // Petición POST al servidor
+    const url = `${servidor}/api/mongoose/agentReport/update`
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    }
+    const response = await fetch(url, options);
+
+    if (response.ok) {
+      showToast('Config saved', 0)
+    } else {
+      showToast(`Error: ${response.status} Error: ${response.statusText}`, 1)
+    }
   } catch (error) {
-      alert("Error al enviar los datos: " + error.message);
+    alert("Error al enviar los datos: " + error.message);
   }
 });
 //Muestra el mensaje 
@@ -558,18 +563,18 @@ function showToast(message, valor) {
   toast.style.display = 'flex';
 
   if (valor === 0) {
-      toast.style.color = 'green'
+    toast.style.color = 'green'
   } else {
-      toast.style.color = 'darkred'
+    toast.style.color = 'darkred'
   }
 
   // Desvanecer y ocultar el toast después de 3 segundos
   setTimeout(() => {
-      toast.style.opacity = '0'; // Desvanecer el toast
-      setTimeout(() => {
-          toast.style.display = 'none'; // Ocultar el toast completamente
-          toast.style.opacity = '1'; // Restablecer la opacidad para el siguiente uso
-      }, 300); // Tiempo de la animación de desvanecimiento
+    toast.style.opacity = '0'; // Desvanecer el toast
+    setTimeout(() => {
+      toast.style.display = 'none'; // Ocultar el toast completamente
+      toast.style.opacity = '1'; // Restablecer la opacidad para el siguiente uso
+    }, 300); // Tiempo de la animación de desvanecimiento
   }, 3000); // Mostrar durante 3 segundos
 }
 
