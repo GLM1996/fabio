@@ -1,5 +1,5 @@
-//const servidor = 'https://backendembededapp.onrender.com'
-const servidor = 'http://localhost:5500'
+const servidor = 'https://backendembededapp.onrender.com'
+//const servidor = 'http://localhost:5500'
 
 var config;
 var ctx_bar = document.getElementById('grafica_barra').getContext('2d');
