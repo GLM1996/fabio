@@ -47,7 +47,7 @@ table thead {
  ul li:hover{
     background-color: gray;
     border-radius: 5px;
-    color: gainsboro!important;
+    color: gainsboro!important;    
  }
  .active{
     background-color: gray;

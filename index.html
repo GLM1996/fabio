@@ -1,491 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reporting</title>
 
-    <!--Boostrap-->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reporting</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!--Boostrap-->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
 
-    <link rel="stylesheet" href="style.css?v-3" />
-  </head>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <body>
-    <nav class="navbar navbar-expand-lg bg-dark text-white sticky-top">
-      <div class="container-fluid">
-        <button
-          class="navbar-toggler bg-white"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav d-flex justify-content-center gap-2 w-100">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#"
-                >Agentes</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Reportes</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Pricing</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <div class="row w-100 m-auto p-4" id="sheetAgents">
-      <div class="col-12 col-lg-2">
-        <label for="">Select the Agent</label>
-        <select
-          class="form-select form-select-sm"
-          aria-label="Default select example"
-          id="select_agent"
-        ></select>
-      </div>
-      <div class="col-12 col-lg-2">
-        <label for="">Select Date</label>
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-default"
-            >Date</span
-          >
-          <input
-            type="date"
-            id="start_date"
-            class="form-control form-control-sm"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-          />
-        </div>
-      </div>
-      <div class="col-12 col-lg-2">
-        <label for="">Hours Start</label>
-        <div class="input-group input-group-sm mb-6">
-          <span class="input-group-text" id="inputGroup-sizing-default">H</span>
-          <input
-            type="number"
-            id="start_hours"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-            value="9"
-          />
-        </div>
-      </div>
-      <div class="col-12 col-lg-2">
-        <label for="">Hours End</label>
-        <div class="input-group input-group-sm mb-6">
-          <span class="input-group-text" id="inputGroup-sizing-default">H</span>
-          <input
-            type="number"
-            id="end_hours"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-            value="18"
-          />
-        </div>
-      </div>
-      <div class="col-12 col-lg-1">
-        <label for="">Text Time</label>
-        <div class="input-group input-group-sm mb-6">
-          <span class="input-group-text" id="inputGroup-sizing-default">H</span>
-          <input
-            type="number"
-            id="text_time"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-            value="2"
-          />
-        </div>
-      </div>
-      <div class="col-12 col-lg-1">
-        <label for="">Wrap Up</label>
-        <div class="input-group input-group-sm mb-6">
-          <span class="input-group-text" id="inputGroup-sizing-default">H</span>
-          <input
-            type="number"
-            id="wrap_up"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-            value="3"
-          />
-        </div>
-      </div>
-      <div class="col-12 col-lg-1">
-        <label for="">Ring Time</label>
-        <div class="input-group input-group-sm mb-6">
-          <span class="input-group-text" id="inputGroup-sizing-default">H</span>
-          <input
-            type="number"
-            id="ring_time"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-            value="0.5"
-          />
-        </div>
-      </div>
-      <div
-        class="col-12 mt-2 d-flex gap-2 justify-content-center align-items-center"
-      >
-        <button class="btn btn-primary" id="search">Search</button>
-        <button
-          class="btn btn-success"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#collapseSummary"
-          aria-expanded="false"
-          aria-controls="collapseSummary"
-          id="summary"
-          hidden
-        >
-          Summary
-        </button>
-      </div>
-      <!--Collapse para Summary-->
-      <div class="collapse my-1" id="collapseSummary">
-        <div class="card card-body">
-          <div class="d-flex flex-wrap gap-2 justify-content-between">
-            <div
-              class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1"
-            >
-              <label for="">CALL MADE</label>
-              <b id="call_made"></b>
-            </div>
-            <div
-              class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1"
-            >
-              <label for="">CONNECTED</label>
-              <b id="call_connected"></b>
-            </div>
-            <div
-              class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1"
-            >
-              <label for="">CONVERSATIONS</label>
-              <b id="call_conversations"></b>
-            </div>
-            <div
-              class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1"
-            >
-              <label for="">CALL RECEIVED</label>
-              <b id="call_received"></b>
-            </div>
+  <link rel="stylesheet" href="style.css?v-3" />
+</head>
 
-            <div
-              class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1"
-            >
-              <label for="">CALL MISSED</label>
-              <b id="call_missed"></b>
-            </div>
-            <div
-              class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1"
-            >
-              <label for="">TALK TIME</label>
-              <b id="call_talk_time"></b>
-            </div>
+<body>
+  <nav class="navbar navbar-expand-lg bg-dark text-white sticky-top">
+    <div class="container-fluid">
+      <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav d-flex justify-content-center gap-2 w-100">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Agentes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Reportes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Pricing</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="row w-100 m-auto p-4" id="sheetAgents">
+    <div class="col-12 col-lg-2">
+      <label for="">Select the Agent</label>
+      <select class="form-select form-select-sm" aria-label="Default select example" id="select_agent"></select>
+    </div>
+    <div class="col-12 col-lg-2">
+      <label for="">Select Date</label>
+      <div class="input-group input-group-sm mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default">Date</span>
+        <input type="date" id="start_date" class="form-control form-control-sm" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" />
+      </div>
+    </div>
+    <div class="col">
+      <label for="">Hours Start</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="start_hours" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="9" />
+      </div>
+    </div>
+    <div class="col">
+      <label for="">Hours End</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="end_hours" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="18" />
+      </div>
+    </div>
+    <div class="col">
+      <label for="">Text Time</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="text_time" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="2" />
+      </div>
+    </div>
+    <div class="col">
+      <label for="">Wrap Up</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="wrap_up" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="3" />
+      </div>
+    </div>
+    <div class="col">
+      <label for="">Ring Time</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="ring_time" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="0.5" />
+      </div>
+    </div>
+    <div class="col">
+      <label for="">Time Zone</label>
+      <div class="input-group input-group-sm mb-6">
+        <select class="form-select form-select-sm" aria-label="Default select example" id="time_zone">
+          <option value="-08:00" data-zona="8">-08:00</option>
+          <option value="-07:00" data-zona="7">-07:00</option>
+          <option value="-06:00" data-zona="6">-06:00</option>
+          <option value="-05:00" data-zona="5">-05:00</option>
+          <option value="-04:00" data-zona="4">-04:00</option>
+          <option value="-03:00" data-zona="3">-03:00</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-12 mt-2 d-flex gap-2 justify-content-center align-items-center">
+      <button class="btn btn-primary" id="search">Search</button>
+      <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSummary"
+        aria-expanded="false" aria-controls="collapseSummary" id="summary" hidden>
+        Summary
+      </button>
+    </div>
+    <!--Collapse para Summary-->
+    <div class="collapse my-1" id="collapseSummary">
+      <div class="card card-body">
+        <div class="d-flex flex-wrap gap-2 justify-content-between">
+          <div
+            class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1">
+            <label for="">CALL MADE</label>
+            <b id="call_made"></b>
           </div>
-        </div>
-      </div>
+          <div
+            class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1">
+            <label for="">CONNECTED</label>
+            <b id="call_connected"></b>
+          </div>
+          <div
+            class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1">
+            <label for="">CONVERSATIONS</label>
+            <b id="call_conversations"></b>
+          </div>
+          <div
+            class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1">
+            <label for="">CALL RECEIVED</label>
+            <b id="call_received"></b>
+          </div>
 
-      <div class="col-12" id="spinner" hidden>
-        <div class="d-flex gap-2 justify-content-center m-2 p-2">
-          <div class="spinner-border text-primary" role="status"></div>
-          <b>Loading ...</b>
-        </div>
-      </div>
-      <div class="col-12 mt-2">
-        <div class="table-responsive">
-          <table class="table table-sm table-hover">
-            <thead class="text-center">
-              <tr>
-                <th>Agent</th>
-                <th>Time Frame</th>
-                <th>Time Call</th>
-                <th>Intent</th>
-                <th>Client Intent</th>
-                <th>Client Target</th>
-                <th>Text Search</th>
-                <th>Intent Client</th>
-                <th>Contactabilidad</th>
-                <th>Gestion Time</th>
-                <th>Occupancy</th>
-              </tr>
-            </thead>
-            <tbody id="tablaDatos">
-              <!-- Aquí irían las filas de la tabla -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Modal -->
-      <div
-        class="modal fade"
-        id="exampleModal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="modalTitle">Modal title</h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="col-12 mt-2 table_modal">
-                <div class="table-responsive">
-                  <table class="table table-hover">
-                    <thead class="text-center">
-                      <tr>
-                        <th>Persona</th>
-                        <th>Seconds</th>
-                        <th>Started</th>
-                        <th>Messages</th>
-                      </tr>
-                    </thead>
-                    <tbody id="tablaDatosModal">
-                      <!-- Aquí irían las filas de la tabla -->
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-            </div>
+          <div
+            class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1">
+            <label for="">CALL MISSED</label>
+            <b id="call_missed"></b>
+          </div>
+          <div
+            class="d-flex flex-1 flex-column align-items-center border border-solid border-2 border-dark p-1 rounded-1">
+            <label for="">TALK TIME</label>
+            <b id="call_talk_time"></b>
           </div>
         </div>
       </div>
     </div>
-    <div class="row w-100 m-auto p-4" id="sheetReports" hidden>
-      <div class="col-12 col-lg-2">
-        <label for="">Select the Agent</label>
-        <select
-          class="form-select form-select-sm"
-          aria-label="Default select example"
-          id="select_agent_graphic"
-        ></select>
-      </div>
-      <div class="col-12 col-lg-2">
-        <label for="">Select Date</label>
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-default"
-            >Date</span
-          >
-          <input
-            type="date"
-            id="start_date_graphic"
-            class="form-control form-control-sm"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-          />
-        </div>
-      </div>
-      <div class="col-12 col-lg-2">
-        <label for="">Hours Start</label>
-        <div class="input-group input-group-sm mb-6">
-          <span class="input-group-text" id="inputGroup-sizing-default">H</span>
-          <input
-            type="number"
-            id="start_hours_graphic"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-            value="9"
-          />
-        </div>
-      </div>
-      <div class="col-12 col-lg-2">
-        <label for="">Hours End</label>
-        <div class="input-group input-group-sm mb-6">
-          <span class="input-group-text" id="inputGroup-sizing-default">H</span>
-          <input
-            type="number"
-            id="end_hours_graphic"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-            value="18"
-          />
-        </div>
-      </div>
-      <div class="col-12 m-2 d-flex justify-content-center align-items-center">
-        <button class="btn btn-success" type="button" id="graphic">
-          Graphic
-        </button>
-      </div>
-      <div class="col-12">
-        <canvas id="grafica_barra"></canvas>
+
+    <div class="col-12" id="spinner" hidden>
+      <div class="d-flex gap-2 justify-content-center m-2 p-2">
+        <div class="spinner-border text-primary" role="status"></div>
+        <b>Loading ...</b>
       </div>
     </div>
-    <button
-      class="btn btn-primary fixed-btn"
-      ype="button"
-      data-bs-toggle="modal"
-      data-bs-target="#modalConfig"
-    >
-      <i class="bi bi-gear"></i>
-    </button>
+    <div class="col-12 mt-2">
+      <div class="table-responsive">
+        <table class="table table-sm table-hover">
+          <thead class="text-center">
+            <tr>
+              <th>Agent</th>
+              <th>Time Frame</th>
+              <th>Time Call</th>
+              <th>Intent</th>
+              <th>Client Intent</th>
+              <th>Client Target</th>
+              <th>Text Search</th>
+              <th>Intent Client</th>
+              <th>Contactabilidad</th>
+              <th>Gestion Time</th>
+              <th>Occupancy</th>
+            </tr>
+          </thead>
+          <tbody id="tablaDatos">
+            <!-- Aquí irían las filas de la tabla -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Modal -->
-    <div
-      class="modal modal-lg fade"
-      id="modalConfig"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="modalTitle">Config</h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+            <h1 class="modal-title fs-5" id="modalTitle">Modal title</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="row w-100 m-auto p-2">
-              <div class="col">
-                <label for="">Hours Start</label>
-                <div class="input-group input-group-sm mb-6">
-                  <span class="input-group-text" id="inputGroup-sizing-default"
-                    >H</span
-                  >
-                  <input
-                    type="number"
-                    id="start_hours_config"
-                    class="form-control"
-                    aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default"
-                    value="9"
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <label for="">Hours End</label>
-                <div class="input-group input-group-sm mb-6">
-                  <span class="input-group-text" id="inputGroup-sizing-default"
-                    >H</span
-                  >
-                  <input
-                    type="number"
-                    id="end_hours_config"
-                    class="form-control"
-                    aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default"
-                    value="18"
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <label for="">Text Time</label>
-                <div class="input-group input-group-sm mb-6">
-                  <span class="input-group-text" id="inputGroup-sizing-default"
-                    >H</span
-                  >
-                  <input
-                    type="number"
-                    id="text_time_config"
-                    class="form-control"
-                    aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default"
-                    value="2"
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <label for="">Wrap Up</label>
-                <div class="input-group input-group-sm mb-6">
-                  <span class="input-group-text" id="inputGroup-sizing-default"
-                    >H</span
-                  >
-                  <input
-                    type="number"
-                    id="wrap_up_config"
-                    class="form-control"
-                    aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default"
-                    value="3"
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <label for="">Ring Time</label>
-                <div class="input-group input-group-sm mb-6">
-                  <span class="input-group-text" id="inputGroup-sizing-default"
-                    >H</span
-                  >
-                  <input
-                    type="number"
-                    id="ring_time_config"
-                    class="form-control"
-                    aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default"
-                    value="0.5"
-                  />
-                </div>
+            <div class="col-12 mt-2 table_modal">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead class="text-center">
+                    <tr>
+                      <th>Persona</th>
+                      <th>Seconds</th>
+                      <th>Started</th>
+                      <th>Messages</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaDatosModal">
+                    <!-- Aquí irían las filas de la tabla -->
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
-          <p id="text-oculto" class="toast fs-6 mx-auto">asd</p>
-          <div class="modal-footer d-flex justify-content-center gap-4">
-            
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Close
-            </button>
-            <button type="button" class="btn btn-success" id="save_config">
-              Save
             </button>
           </div>
         </div>
       </div>
     </div>
-    
-    <script type="module" src="app.js?v-3"></script>
-  </body>
+  </div>
+  <div class="row w-100 m-auto p-4" id="sheetReports" hidden>
+    <div class="col-12 col-lg-2">
+      <label for="">Select the Agent</label>
+      <select class="form-select form-select-sm" aria-label="Default select example" id="select_agent_graphic"></select>
+    </div>
+    <div class="col-12 col-lg-2">
+      <label for="">Select Date</label>
+      <div class="input-group input-group-sm mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default">Date</span>
+        <input type="date" id="start_date_graphic" class="form-control form-control-sm"
+          aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
+      </div>
+    </div>
+    <div class="col-12 col-lg-2">
+      <label for="">Hours Start</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="start_hours_graphic" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="9" />
+      </div>
+    </div>
+    <div class="col-12 col-lg-2">
+      <label for="">Hours End</label>
+      <div class="input-group input-group-sm mb-6">
+        <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+        <input type="number" id="end_hours_graphic" class="form-control" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default" value="18" />
+      </div>
+    </div>
+    <div class="col-12 m-2 d-flex justify-content-center align-items-center">
+      <button class="btn btn-success" type="button" id="graphic">
+        Graphic
+      </button>
+    </div>
+    <div class="col-12">
+      <canvas id="grafica_barra"></canvas>
+    </div>
+  </div>
+  <button class="btn btn-primary fixed-btn" ype="button" data-bs-toggle="modal" data-bs-target="#modalConfig">
+    <i class="bi bi-gear"></i>
+  </button>
+  <!-- Modal -->
+  <div class="modal modal-lg fade" id="modalConfig" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalTitle">Config</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row w-100 m-auto p-2">
+            <div class="col">
+              <label for="">Hours Start</label>
+              <div class="input-group input-group-sm mb-6">
+                <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+                <input type="number" id="start_hours_config" class="form-control" aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-default" value="9" />
+              </div>
+            </div>
+            <div class="col">
+              <label for="">Hours End</label>
+              <div class="input-group input-group-sm mb-6">
+                <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+                <input type="number" id="end_hours_config" class="form-control" aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-default" value="18" />
+              </div>
+            </div>
+            <div class="col">
+              <label for="">Text Time</label>
+              <div class="input-group input-group-sm mb-6">
+                <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+                <input type="number" id="text_time_config" class="form-control" aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-default" value="2" />
+              </div>
+            </div>
+            <div class="col">
+              <label for="">Wrap Up</label>
+              <div class="input-group input-group-sm mb-6">
+                <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+                <input type="number" id="wrap_up_config" class="form-control" aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-default" value="3" />
+              </div>
+            </div>
+            <div class="col">
+              <label for="">Ring Time</label>
+              <div class="input-group input-group-sm mb-6">
+                <span class="input-group-text" id="inputGroup-sizing-default">H</span>
+                <input type="number" id="ring_time_config" class="form-control" aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-default" value="0.5" />
+              </div>
+            </div>
+            <div class="col">
+              <label for="">Time Zone</label>
+              <div class="input-group input-group-sm mb-6">
+                <select class="form-select form-select-sm" aria-label="Default select example" id="time_zone_config">
+                  <option value="-08:00" data-zona="8">-08:00</option>
+                  <option value="-07:00" data-zona="7">-07:00</option>
+                  <option value="-06:00" data-zona="6">-06:00</option>
+                  <option value="-05:00" data-zona="5">-05:00</option>
+                  <option value="-04:00" data-zona="4">-04:00</option>
+                  <option value="-03:00" data-zona="3">-03:00</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="text-oculto" class="toast fs-6 mx-auto">asd</p>
+        <div class="modal-footer d-flex justify-content-center gap-4">
+
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="button" class="btn btn-success" id="save_config">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v-3"></script>
+</body>
+
 </html>

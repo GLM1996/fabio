@@ -1,5 +1,5 @@
-const servidor = 'https://backendembededapp.onrender.com'
-//const servidor = 'http://localhost:5500'
+//const servidor = 'https://backendembededapp.onrender.com'
+const servidor = 'http://localhost:5500'
 
 var config;
 var ctx_bar = document.getElementById('grafica_barra').getContext('2d');
@@ -10,6 +10,7 @@ let agentSelected = [];
 let calls
 
 const selectAgent = document.getElementById("select_agent");
+const selectTimeZona = document.getElementById("time_zone");
 const selectAgentGrphic = document.getElementById("select_agent_graphic")
 
 const tbody = document.getElementById('tablaDatos')
@@ -19,6 +20,8 @@ const spinner = document.getElementById('spinner')
 let textTime = Number(document.getElementById('text_time').value)
 let wrapUp = Number(document.getElementById('wrap_up').value)
 let ringTime = Number(document.getElementById('ring_time').value)
+
+let timeZone = selectTimeZona.value
 
 //TODO-----------------------------------------------------Funciones al cargar la pagina-------------------------------
 
@@ -82,12 +85,14 @@ async function getReport() {
       document.getElementById("text_time").value = result.textTime;
       document.getElementById("wrap_up").value = result.wrapUp;
       document.getElementById("ring_time").value = result.ringTime;
+      document.getElementById("time_zone").value = result.timeZone;
 
       document.getElementById("start_hours_config").value = result.hoursStart;
       document.getElementById("end_hours_config").value = result.hoursEnd;
       document.getElementById("text_time_config").value = result.textTime;
       document.getElementById("wrap_up_config").value = result.wrapUp;
       document.getElementById("ring_time_config").value = result.ringTime;
+      document.getElementById("time_zone_config").value = result.timeZone;
 
     } else {
       console.log("No se encontró el reporte.");
@@ -131,10 +136,12 @@ document.getElementById("search").addEventListener("click", async () => {
 
   spinner.hidden = false
 
-  let timeZone = '-08:00'
+
+  //let timeZone = '-08:00'
   let callFilters = []
   let calls = await buscar();
 
+  timeZone = selectTimeZona.value
   textTime = Number(document.getElementById('text_time').value)
   wrapUp = Number(document.getElementById('wrap_up').value)
   ringTime = Number(document.getElementById('ring_time').value)
@@ -285,8 +292,9 @@ function convertUTCToLocal(dateUTC) {
   const hours = date.getUTCHours().toString().padStart(2, '0'); // Asegurar dos dígitos
   const mins = date.getUTCMinutes().toString().padStart(2, '0'); // Asegurar dos dígitos
   const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-
-  return `${hours - 8}:${mins}:${seconds}`;
+  const selectedOption = selectTimeZona.options[selectTimeZona.selectedIndex];
+  const zonaHoraria = Number(selectedOption.getAttribute("data-zona"));
+  return `${hours - zonaHoraria}:${mins}:${seconds}`;
 }
 //Crea los time frame o horarios Ej: 09:00:00 - 10:00:00
 let hoursArray = (hourStart, hourEnd) => {
@@ -341,8 +349,10 @@ function ajustarFechaTimeFrame(timeFrame) {
 
   // Definir el día específico y la zona horaria
   const diaEspecifico = selectedDate;
-  const zonaHoraria = 8; // Ajuste de zona horaria  
-
+  //const zonaHoraria = 8; // Ajuste de zona horaria  
+  const selectedOption = selectTimeZona.options[selectTimeZona.selectedIndex];
+  const zonaHoraria = Number(selectedOption.getAttribute("data-zona"));
+  //const zonaHoraria = document.getElementById('time_zone')
   // Crear fechas de inicio y fin del día en UTC
   const inicioDia = new Date(`${diaEspecifico}T${timeFrame.start_date}Z`);
   const finDia = new Date(`${diaEspecifico}T${timeFrame.end_date}Z`);
@@ -532,9 +542,10 @@ saveConfig.addEventListener("click", async () => {
     hoursEnd: parseFloat(document.getElementById("end_hours_config").value),
     textTime: parseFloat(document.getElementById("text_time_config").value),
     wrapUp: parseFloat(document.getElementById("wrap_up_config").value),
-    ringTime: parseFloat(document.getElementById("ring_time_config").value)
+    ringTime: parseFloat(document.getElementById("ring_time_config").value),
+    timeZone: (document.getElementById("time_zone_config").value)
   };
-
+  
   try {
     // Petición POST al servidor
     const url = `${servidor}/api/mongoose/agentReport/update`
